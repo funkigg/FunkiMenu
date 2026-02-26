@@ -3,25 +3,25 @@ local addonName, addon = ...
 local MenuScaffold = {}
 addon.MenuScaffold = MenuScaffold
 
-local DEFAULT_MENU = {
-    title = "Placeholder Menu",
-    width = 320,
-    buttonHeight = 24,
-    padding = 12,
-    items = {
+local DEFAULT_DATA = {
+    title = "Menu Scaffold",
+    width = 420,
+    height = 320,
+    tabs = {
         {
-            type = "label",
-            text = "Replace this data with your own menu entries.",
+            id = "tab_one",
+            label = "Tab One",
+            subtabs = {
+                { id = "subtab_a", label = "Subtab A", content = "Placeholder content for Subtab A." },
+                { id = "subtab_b", label = "Subtab B", content = "Placeholder content for Subtab B." },
+            },
         },
         {
-            type = "separator",
-        },
-        {
-            type = "button",
-            text = "Placeholder Action",
-            onClick = function()
-                print("[" .. addonName .. "] Placeholder action triggered.")
-            end,
+            id = "tab_two",
+            label = "Tab Two",
+            subtabs = {
+                { id = "subtab_a", label = "Subtab A", content = "Placeholder content for Tab Two / Subtab A." },
+            },
         },
     },
 }
@@ -43,10 +43,94 @@ local function copyDefaults(target, source)
     return target
 end
 
-local function createBaseFrame(config)
-    local frame = CreateFrame("Frame", addonName .. "Frame", UIParent, "BackdropTemplate")
-    frame:SetSize(config.width, 120)
-    frame:SetPoint(config.anchorPoint or "CENTER")
+local function clearButtons(buttons)
+    for _, button in ipairs(buttons) do
+        button:Hide()
+    end
+    wipe(buttons)
+end
+
+local function setContent(frame, text)
+    frame.contentText:SetText(text or "Placeholder content")
+end
+
+local function renderSubtabs(frame, tab)
+    clearButtons(frame.subtabButtons)
+    frame.activeSubtab = nil
+
+    local previous
+    for _, subtab in ipairs(tab.subtabs or {}) do
+        local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+        button:SetSize(110, 22)
+
+        if previous then
+            button:SetPoint("TOPLEFT", previous, "TOPRIGHT", 6, 0)
+        else
+            button:SetPoint("TOPLEFT", frame.subtabAnchor, "TOPLEFT", 0, 0)
+        end
+
+        button:SetText(subtab.label or "Subtab")
+        button:SetScript("OnClick", function()
+            frame.activeSubtab = subtab.id
+            setContent(frame, subtab.content)
+        end)
+
+        table.insert(frame.subtabButtons, button)
+        previous = button
+    end
+
+    if tab.subtabs and tab.subtabs[1] then
+        frame.activeSubtab = tab.subtabs[1].id
+        setContent(frame, tab.subtabs[1].content)
+    else
+        setContent(frame, "No subtabs configured for this tab.")
+    end
+end
+
+local function renderTabs(frame, config)
+    clearButtons(frame.tabButtons)
+    frame.activeTab = nil
+
+    local previous
+    for _, tab in ipairs(config.tabs or {}) do
+        local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+        button:SetSize(110, 24)
+
+        if previous then
+            button:SetPoint("TOPLEFT", previous, "TOPRIGHT", 6, 0)
+        else
+            button:SetPoint("TOPLEFT", frame.tabAnchor, "TOPLEFT", 0, 0)
+        end
+
+        button:SetText(tab.label or "Tab")
+        button:SetScript("OnClick", function()
+            frame.activeTab = tab.id
+            renderSubtabs(frame, tab)
+        end)
+
+        table.insert(frame.tabButtons, button)
+        previous = button
+    end
+
+    if config.tabs and config.tabs[1] then
+        frame.activeTab = config.tabs[1].id
+        renderSubtabs(frame, config.tabs[1])
+    else
+        setContent(frame, "No tabs configured.")
+    end
+end
+
+function MenuScaffold:Build(data)
+    local config = copyDefaults(data, DEFAULT_DATA)
+
+    if self.frame then
+        self.frame:Hide()
+        self.frame = nil
+    end
+
+    local frame = CreateFrame("Frame", addonName .. "ScaffoldFrame", UIParent, "BackdropTemplate")
+    frame:SetSize(config.width, config.height)
+    frame:SetPoint("CENTER")
     frame:SetBackdrop({
         bgFile = "Interface/Tooltips/UI-Tooltip-Background",
         edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -62,123 +146,35 @@ local function createBaseFrame(config)
     frame:SetScript("OnDragStart", frame.StartMoving)
     frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
 
-    local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    title:SetPoint("TOP", 0, -config.padding)
-    title:SetText(config.title)
-    frame.title = title
+    frame.tabButtons = {}
+    frame.subtabButtons = {}
 
-    return frame
-end
+    frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    frame.title:SetPoint("TOP", 0, -14)
+    frame.title:SetText(config.title)
 
-local function applyButtonLayout(button, config)
-    button:SetHeight(config.buttonHeight)
-    button:SetNormalFontObject("GameFontNormal")
-    button:SetHighlightFontObject("GameFontHighlight")
-end
+    frame.tabAnchor = CreateFrame("Frame", nil, frame)
+    frame.tabAnchor:SetSize(config.width - 24, 24)
+    frame.tabAnchor:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -42)
 
-local function createItemWidget(parent, config, item, previous)
-    local anchorX = config.padding
-    local anchorY = previous and -6 or -(config.padding * 2 + 10)
+    frame.subtabAnchor = CreateFrame("Frame", nil, frame)
+    frame.subtabAnchor:SetSize(config.width - 24, 22)
+    frame.subtabAnchor:SetPoint("TOPLEFT", frame.tabAnchor, "BOTTOMLEFT", 0, -8)
 
-    if item.type == "separator" then
-        local line = parent:CreateTexture(nil, "ARTWORK")
-        line:SetColorTexture(0.6, 0.6, 0.65, 0.7)
-        line:SetHeight(1)
-        line:SetPoint("TOPLEFT", previous or parent.title, previous and "BOTTOMLEFT" or "BOTTOMLEFT", 0, anchorY)
-        line:SetPoint("TOPRIGHT", previous or parent.title, previous and "BOTTOMRIGHT" or "BOTTOMRIGHT", 0, anchorY)
-        return line, 8
-    end
+    frame.contentText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    frame.contentText:SetPoint("TOPLEFT", frame.subtabAnchor, "BOTTOMLEFT", 0, -16)
+    frame.contentText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -14, 14)
+    frame.contentText:SetJustifyH("LEFT")
+    frame.contentText:SetJustifyV("TOP")
+    frame.contentText:SetText("Placeholder content")
 
-    if item.type == "label" then
-        local label = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        label:SetPoint("TOPLEFT", previous or parent.title, previous and "BOTTOMLEFT" or "BOTTOMLEFT", previous and 0 or -(parent:GetWidth() / 2 - anchorX), anchorY)
-        if not previous then
-            label:SetPoint("TOPLEFT", parent, "TOPLEFT", anchorX, anchorY)
-        end
-        label:SetPoint("RIGHT", parent, "RIGHT", -config.padding, 0)
-        label:SetJustifyH("LEFT")
-        label:SetText(item.text or "Placeholder Label")
-        return label, 16
-    end
+    renderTabs(frame, config)
 
-    if item.type == "toggle" then
-        local check = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
-        if previous then
-            check:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, anchorY)
-        else
-            check:SetPoint("TOPLEFT", parent, "TOPLEFT", anchorX, anchorY)
-        end
-
-        check.text = check:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        check.text:SetPoint("LEFT", check, "RIGHT", 6, 0)
-        check.text:SetText(item.text or "Placeholder Toggle")
-
-        check:SetChecked(item.defaultState == true)
-        check:SetScript("OnClick", function(self)
-            if item.onToggle then
-                item.onToggle(self:GetChecked())
-            end
-        end)
-
-        return check, config.buttonHeight
-    end
-
-    local button = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
-    if previous then
-        button:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, anchorY)
-    else
-        button:SetPoint("TOPLEFT", parent, "TOPLEFT", anchorX, anchorY)
-    end
-
-    button:SetWidth(parent:GetWidth() - config.padding * 2)
-    applyButtonLayout(button, config)
-    button:SetText(item.text or "Placeholder Button")
-    button:SetScript("OnClick", function()
-        if item.onClick then
-            item.onClick()
-        end
-    end)
-
-    return button, config.buttonHeight
-end
-
-function MenuScaffold:Build(config)
-    config = copyDefaults(config, DEFAULT_MENU)
-
-    if self.frame then
-        self.frame:Hide()
-        self.frame = nil
-    end
-
-    local frame = createBaseFrame(config)
-    local previous = nil
-    local totalHeight = config.padding * 2 + 28
-
-    for _, item in ipairs(config.items or {}) do
-        local widget, height = createItemWidget(frame, config, item, previous)
-        previous = widget
-        totalHeight = totalHeight + (height or config.buttonHeight) + 6
-    end
-
-    frame:SetHeight(totalHeight)
     frame:Hide()
-
     self.frame = frame
     self.config = config
 
     return frame
-end
-
-function MenuScaffold:Show()
-    if self.frame then
-        self.frame:Show()
-    end
-end
-
-function MenuScaffold:Hide()
-    if self.frame then
-        self.frame:Hide()
-    end
 end
 
 function MenuScaffold:Toggle()
@@ -196,8 +192,7 @@ end
 SLASH_FUNKIMENU1 = "/funkimenu"
 SlashCmdList.FUNKIMENU = function()
     if not MenuScaffold.frame then
-        local baseConfig = addon.MenuTemplate or DEFAULT_MENU
-        MenuScaffold:Build(baseConfig)
+        MenuScaffold:Build(addon.MenuTemplate or DEFAULT_DATA)
     end
 
     MenuScaffold:Toggle()

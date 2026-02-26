@@ -1,40 +1,36 @@
 local _, addon = ...
 
 addon.MenuTemplate = {
-    title = "Project Menu",
-    width = 340,
-    buttonHeight = 24,
-    padding = 12,
-    anchorPoint = "CENTER",
-    items = {
+    title = "Project Placeholder Menu",
+    width = 420,
+    height = 320,
+    tabs = {
         {
-            type = "label",
-            text = "This is a placeholder scaffold. Replace entries in MenuTemplate.lua.",
+            id = "main",
+            label = "Main",
+            subtabs = {
+                {
+                    id = "overview",
+                    label = "Overview",
+                    content = "Replace this with your main overview content.",
+                },
+                {
+                    id = "settings",
+                    label = "Settings",
+                    content = "Replace this with your settings content.",
+                },
+            },
         },
         {
-            type = "separator",
-        },
-        {
-            type = "button",
-            text = "Primary Action",
-            onClick = function()
-                print("Primary action placeholder")
-            end,
-        },
-        {
-            type = "button",
-            text = "Secondary Action",
-            onClick = function()
-                print("Secondary action placeholder")
-            end,
-        },
-        {
-            type = "toggle",
-            text = "Enable Optional Feature",
-            defaultState = false,
-            onToggle = function(enabled)
-                print("Optional feature state:", enabled and "enabled" or "disabled")
-            end,
+            id = "extras",
+            label = "Extras",
+            subtabs = {
+                {
+                    id = "notes",
+                    label = "Notes",
+                    content = "Use this for project-specific notes or info.",
+                },
+            },
         },
     },
 }

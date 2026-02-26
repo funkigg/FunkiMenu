@@ -1,24 +1,28 @@
 # Funki Menu Scaffold
 
-This repository contains a stripped-down, reusable WoW addon menu scaffold.
+A minimal reusable World of Warcraft addon menu scaffold.
 
-## What this template does
+## Scope
 
-- Creates a movable framed menu.
-- Renders menu entries from a simple data table.
-- Supports placeholder item types:
-  - `label`
-  - `separator`
-  - `button`
-  - `toggle`
+This version intentionally contains only:
 
-## How to reuse
+- A generic menu frame scaffold.
+- A simple tab/subtab renderer.
+- Placeholder structured data in one table.
 
-1. Copy `FunkiMenu.lua` and `MenuTemplate.lua` into your addon.
-2. Rename addon metadata in `.toc`.
-3. Replace the `addon.MenuTemplate.items` table with your own entries.
-4. Trigger with `/funkimenu` (or change slash command name).
+No Clickable Raid Buffs logic is included.
 
-## Notes
+## Data structure
 
-All Clickable Raid Buffs-specific behavior has been removed. Only generic scaffold behavior remains.
+Edit `addon.MenuTemplate` in `MenuTemplate.lua`:
+
+- `title`, `width`, `height`
+- `tabs[]`
+  - `id`, `label`
+  - `subtabs[]`
+    - `id`, `label`, `content`
+
+## Usage
+
+- Run `/funkimenu` in-game to toggle the scaffold.
+- Replace placeholder tabs/subtabs/content with project-specific values.
