@@ -1,34 +1,29 @@
 local _, addon = ...
 
 addon.MenuTemplate = {
-    title = "Project Placeholder Menu",
+    title = "FunkiMenu",
     width = 420,
     height = 320,
     tabs = {
         {
-            id = "main",
-            label = "Main",
+            id = "placeholder_tab_1",
+            label = "Placeholder Tab 1",
             subtabs = {
                 {
-                    id = "overview",
-                    label = "Overview",
-                    content = "Replace this with your main overview content.",
-                },
-                {
-                    id = "settings",
-                    label = "Settings",
-                    content = "Replace this with your settings content.",
+                    id = "placeholder_subtab_1",
+                    label = "Placeholder Subtab 1",
+                    content = "Replace this content in MenuTemplate.lua",
                 },
             },
         },
         {
-            id = "extras",
-            label = "Extras",
+            id = "placeholder_tab_2",
+            label = "Placeholder Tab 2",
             subtabs = {
                 {
-                    id = "notes",
-                    label = "Notes",
-                    content = "Use this for project-specific notes or info.",
+                    id = "placeholder_subtab_2",
+                    label = "Placeholder Subtab 2",
+                    content = "Add additional subtabs and content as needed.",
                 },
             },
         },

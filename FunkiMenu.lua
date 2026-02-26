@@ -4,26 +4,10 @@ local MenuScaffold = {}
 addon.MenuScaffold = MenuScaffold
 
 local DEFAULT_DATA = {
-    title = "Menu Scaffold",
+    title = "FunkiMenu",
     width = 420,
     height = 320,
-    tabs = {
-        {
-            id = "tab_one",
-            label = "Tab One",
-            subtabs = {
-                { id = "subtab_a", label = "Subtab A", content = "Placeholder content for Subtab A." },
-                { id = "subtab_b", label = "Subtab B", content = "Placeholder content for Subtab B." },
-            },
-        },
-        {
-            id = "tab_two",
-            label = "Tab Two",
-            subtabs = {
-                { id = "subtab_a", label = "Subtab A", content = "Placeholder content for Tab Two / Subtab A." },
-            },
-        },
-    },
+    tabs = {},
 }
 
 local function copyDefaults(target, source)
@@ -96,7 +80,7 @@ local function renderTabs(frame, config)
         frame.activeTab = config.tabs[1].id
         renderSubtabs(frame, config.tabs[1])
     else
-        setContent(frame, "No tabs configured.")
+        setContent(frame, "No tabs configured. Add tabs in MenuTemplate.lua")
     end
 end
 
