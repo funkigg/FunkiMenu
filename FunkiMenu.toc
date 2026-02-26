@@ -1,0 +1,8 @@
+## Interface: 11507
+## Title: Funki Menu Scaffold
+## Notes: Reusable menu scaffold template extracted and generalized for other projects.
+## Author: Scaffold Template
+## Version: 1.0.0
+
+FunkiMenu.lua
+MenuTemplate.lua
