@@ -10,7 +10,7 @@ This version intentionally contains only:
 - A simple tab/subtab renderer.
 - Placeholder structured data in one table.
 
-No Clickable Raid Buffs logic is included.
+No legacy addon logic is included; this package is purely FunkiMenu scaffold code.
 
 ## Data structure
 

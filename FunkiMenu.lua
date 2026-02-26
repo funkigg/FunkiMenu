@@ -60,17 +60,7 @@ local function renderSubtabs(frame, tab)
 
     local previous
     for _, subtab in ipairs(tab.subtabs or {}) do
-        local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-        button:SetSize(110, 22)
-
-        if previous then
-            button:SetPoint("TOPLEFT", previous, "TOPRIGHT", 6, 0)
-        else
-            button:SetPoint("TOPLEFT", frame.subtabAnchor, "TOPLEFT", 0, 0)
-        end
-
-        button:SetText(subtab.label or "Subtab")
-        button:SetScript("OnClick", function()
+        local button = addon.OptionsElements.CreateSubtabButton(frame, previous, subtab.label, function()
             frame.activeSubtab = subtab.id
             setContent(frame, subtab.content)
         end)
@@ -93,17 +83,7 @@ local function renderTabs(frame, config)
 
     local previous
     for _, tab in ipairs(config.tabs or {}) do
-        local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-        button:SetSize(110, 24)
-
-        if previous then
-            button:SetPoint("TOPLEFT", previous, "TOPRIGHT", 6, 0)
-        else
-            button:SetPoint("TOPLEFT", frame.tabAnchor, "TOPLEFT", 0, 0)
-        end
-
-        button:SetText(tab.label or "Tab")
-        button:SetScript("OnClick", function()
+        local button = addon.OptionsElements.CreateTabButton(frame, previous, tab.label, function()
             frame.activeTab = tab.id
             renderSubtabs(frame, tab)
         end)
@@ -161,12 +141,7 @@ function MenuScaffold:Build(data)
     frame.subtabAnchor:SetSize(config.width - 24, 22)
     frame.subtabAnchor:SetPoint("TOPLEFT", frame.tabAnchor, "BOTTOMLEFT", 0, -8)
 
-    frame.contentText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    frame.contentText:SetPoint("TOPLEFT", frame.subtabAnchor, "BOTTOMLEFT", 0, -16)
-    frame.contentText:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -14, 14)
-    frame.contentText:SetJustifyH("LEFT")
-    frame.contentText:SetJustifyV("TOP")
-    frame.contentText:SetText("Placeholder content")
+    frame.contentText = addon.OptionsElements.CreateContentText(frame)
 
     renderTabs(frame, config)
 
