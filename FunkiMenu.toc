@@ -1,0 +1,11 @@
+## Interface: 11507
+## Title: FunkiMenu
+## Notes: Minimal reusable FunkiMenu scaffold with placeholder tabs and subtabs.
+## Author: FunkiMenu
+## Version: 1.2.0
+
+Options/Elements/TabButton.lua
+Options/Elements/SubtabButton.lua
+Options/Elements/ContentText.lua
+MenuTemplate.lua
+FunkiMenu.lua
